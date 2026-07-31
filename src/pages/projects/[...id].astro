@@ -1,0 +1,29 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+	const projects = await getCollection('projects');
+	return projects.map((project) => ({
+		params: { id: project.id },
+		props: { project },
+	}));
+}
+
+interface Props {
+	project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={project.data.title} description={project.data.summary}>
+	<article class="section prose">
+		<p class="eyebrow">{project.data.year}</p>
+		<h1>{project.data.title}</h1>
+		<p class="lede">{project.data.summary}</p>
+		<Content />
+		<p><a href={`${import.meta.env.BASE_URL}projects/`}>Back to projects</a></p>
+	</article>
+</BaseLayout>

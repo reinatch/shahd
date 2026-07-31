@@ -1,0 +1,79 @@
+---
+import '../styles/global.css';
+import { navigationItems } from '../data/navigation';
+
+interface Props {
+	title: string;
+	description: string;
+	fullscreen?: boolean;
+}
+
+const { title, description, fullscreen = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="description" content={description} />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title === 'Shahd' ? title : `${title} — Shahd`}</title>
+	</head>
+	<body class:list={{ 'is-fullscreen': fullscreen }}>
+		<a class="skip-link" href="#content">Skip to content</a>
+		<header class="site-header">
+			<a class="wordmark" href={base} aria-label="Art by Shahd">
+				<span class="wordmark-context">Art</span>
+				<span class="wordmark-by">by</span>
+				<span class="wordmark-name">Shahd</span>
+			</a>
+			<details class="menu">
+				<summary aria-label="Open navigation"><span>Menu</span></summary>
+				<nav aria-label="Primary">
+					<ul>
+						{navigationItems.map((item) => (
+							<li>
+								<a href={item.href} data-nav-label={item.label}>{item.label}</a>
+							</li>
+						))}
+					</ul>
+				</nav>
+			</details>
+		</header>
+		<main id="content"><slot /></main>
+		<footer class="site-footer">© {new Date().getFullYear()} reinatch</footer>
+		<script>
+			const menu = document.querySelector<HTMLDetailsElement>('.menu');
+			const wordmark = document.querySelector<HTMLAnchorElement>('.wordmark');
+			const wordmarkContext = document.querySelector<HTMLElement>('.wordmark-context');
+			const navigationLinks = document.querySelectorAll<HTMLElement>('[data-nav-label]');
+			const setWordmark = (label = 'Art') => {
+				if (wordmarkContext) wordmarkContext.textContent = label;
+				if (wordmark) wordmark.setAttribute('aria-label', `${label} by Shahd`);
+			};
+			navigationLinks.forEach((link) => {
+				const showSection = () => setWordmark(link.dataset.navLabel || 'Art');
+				link.addEventListener('mouseenter', showSection);
+				link.addEventListener('focus', showSection);
+				link.addEventListener('mouseleave', () => setWordmark());
+				link.addEventListener('blur', () => setWordmark());
+			});
+			window.addEventListener('portfolio-hover', (event) => {
+				setWordmark((event as CustomEvent<string>).detail || 'Art');
+			});
+			if (menu) {
+				menu.addEventListener('mouseenter', () => { menu.open = true; });
+				menu.addEventListener('mouseleave', () => {
+					if (!menu.matches(':focus-within')) menu.open = false;
+				});
+				menu.addEventListener('focusout', () => {
+					requestAnimationFrame(() => {
+						if (!menu.matches(':hover, :focus-within')) menu.open = false;
+					});
+				});
+			}
+		</script>
+	</body>
+</html>

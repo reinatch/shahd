@@ -1,0 +1,25 @@
+---
+import PortraitIsland from '../components/PortraitIsland';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { navigationItems } from '../data/navigation';
+---
+
+<BaseLayout title="Shahd" description="Portfolio experiment for visual designer Shahd." fullscreen>
+	<section class="hero">
+		<!-- <div class="hero-copy">
+			<p class="eyebrow">Visual designer</p>
+			<h1>Shahd</h1>
+			<p class="hero-intro">Selected work, illustration and visual design.</p>
+			<a class="hero-link" href={`${import.meta.env.BASE_URL}paintings/`}>Explore selected work</a>
+		</div> -->
+		<div class="portrait">
+			<div class="portrait-fallback" role="img" aria-label="Placeholder portrait for Shahd">
+				<span>Portrait artwork placeholder</span>
+			</div>
+			<!-- React and Three.js load only for this component, when it is visible. -->
+			<PortraitIsland client:visible items={navigationItems} />
+		</div>
+
+	</section>
+
+</BaseLayout>
